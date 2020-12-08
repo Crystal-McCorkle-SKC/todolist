@@ -111,7 +111,21 @@ db.once('open', function(){
         console.error(err)
     })
 
-    //READ
+    //create new list w/ our item 
+    //but don't really need this list schema 
+    var myList = new List ({
+        name: "Crystal's List",
+        items: [
+            {
+            item: item1._id
+            },
+            {
+            item: newItem._id
+            }
+            ],
+    });
+
+    //READ (FIND)
     //testing to see if the below works: 
     //fetch a record that was just created (READ)
     //uses the search term Do Dishes--then prints to the terminal (using promise) or gives 
@@ -126,6 +140,17 @@ db.once('open', function(){
             console.error.error(err)
         })
 
+    //findbyid (find an item in the item schema)
+    //returns item1 by its id
+    Item.findById(item1._id, function(err, item) {
+        console.log(item1);
+    });
+
+    //finding an item from a list
+    List.find({item: item1._id}, function(err, items) {
+        console.log(items); //what will be inside this object? answer: it will print this--- [{item: ItemId("0werituqwieuew09u09")}]
+    });
+
     //UPDATE 
     //this finds the given item and then UPDATEs it    
     Item.findOneAndUpdate (
@@ -133,7 +158,7 @@ db.once('open', function(){
             {itemName: "Do Dishes"
             },
             //this is the field (name) and the value to update to: Scrub-a-dub those dishes!! 
-            {name: "Scrub-a-dub those dishes!!"
+            {itemName: "Scrub-a-dub those dishes!!"
             },
             //returns updated doc
             { new : true,
@@ -150,11 +175,11 @@ db.once('open', function(){
             })
 
 
-        //DELETE
+        //DELETE---NOTE, SHOULD USE findOneAndDelete per the docs!! 
         //.findOneAndRemove removes the record name: "Scrub-a-dub those dishes!"
         //and returns the original document that was removed--name goes back to "Do Dishes"
         Item.findOneAndRemove ({
-                name: "Scrub-a-dub those dishes!!"
+                itemName: "Scrub-a-dub those dishes!!"
             })
             //prints the response 
             .then(response => {
@@ -165,6 +190,11 @@ db.once('open', function(){
                 console.error(err)
             })
 
+    //findOneAndDelete
+    Item.findOneAndDelete({itemId: item1._id}, function(err, item) {
+        console.log("deleted: ");
+        console.log(item);
+    });
 
    //CREATEs a new item name called Dance Party, if there is an error, do the 
    //callback function instead
