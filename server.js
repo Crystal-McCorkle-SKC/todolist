@@ -1,14 +1,14 @@
 //import the mongoose module 
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 // Make Mongoose use `findOneAndUpdate()`. Note that this option is `true`
 // by default, you need to set it to false, otherwise get a deprecation warning
 //at top of terminal code 
-//mongoose.set('useFindAndModify', false);
+mongoose.set("useFindAndModify", false);
 
 //this is setting vars for Item and List --pulls in the files from my other .js files 
-var List = require('./models/ToDo.js');
-var Item = require('./models/ToDoItem.js');
+const List = require("./models/ToDo.js");
+const Item = require("./models/ToDoItem.js");
 
 //this loads in the express module 
 const express = require("express");
@@ -22,27 +22,41 @@ const app = express();
 const port = 3000;
 
 //import the mongodb string (so can access my personal db)
-const mongoDB = 'mongodb+srv://crystallmccorkle:^JgHbL24895@m@todolist.3bg8d.mongodb.net/todolistdb?retryWrites=t'; 
+const mongoDB = "mongodb+srv://crystallmccorkle:^JgHbL24895@m@todolist.3bg8d.mongodb.net/todolistdb?retryWrites=t"; 
 
 //use mongoose library to connectoto mongo db 
 //if worked, prints connected to db, if not gives an error 
 mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true}, (err, client) => {
     if(err) return console.error(err);
-    console.log('Connected to database'); 
+    console.log("Connected to database"); 
 }); 
 
 
+//allows us to acces the embedded js 
+app.set("view engine", "ejs");
+
 //connect to connect object, use the "on" method, if there is an error, gives you an error message 
 const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error: '));
+db.on("error", console.error.bind(console, "MongoDB connection error:"));
 
 
 //use says: use the following middleware, which is express.static
 //express.static: is middleware for delivering static files like html, css, js, img, etc.
 //static defaults to delivering index.html as the default root 
 //path.join: takes care of relative paths 
-//app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
+
+//Add a app.post to send some data and save it 
+//Add a app.put call to update some data
+//Add a app.delete call to delete some data 
+//(We've already written mongoose code to do this, so you're plugging in the rest using our GET code as an example). 
+ 
+
+
+
+//urlencoded extracts the data from the form and adds to body 
+app.use(express.urlencoded({ extended: true }));
 
 //opening up our server to listen on a specific ip address and port
 //ip addresses are also known as hostnames 
@@ -50,17 +64,71 @@ app.listen(port, function(){
     console.log("The server IS running AT port " + port);
 });
 
-//gets full list  
- app.get("/items", function(request, response){
-//     //response.send("Hello World!!!!!");
-    //get data
-     Item.find(function (err, items) {
-        if (err) return console.error(err);
-       //this send the items back to the client 
-        response.send(items);
-     });
-    });
+// //gets full list  
+//  app.get("/items", function(request, response){
+// //     //response.send("Hello World!!!!!");
+//     //get data
+//      Item.find(function (err, items) {
+//         if (err) return console.error(err);
+//        //this send the items back to the client 
+//         response.send(items);
+//      });
+//     });
 
+
+// GET METHOD-gets items 
+app.get("/items", (req, res) => {
+    Item.find({}, (err, tasks) => {
+    res.render("index.html", { itemName: item });
+    });
+});
+
+
+
+//POST 
+// app.post("/items",async (req, res) => {
+//     const item = new Item({
+//     content: req.body.content
+//     });
+//     try {
+//     await item.save();
+//     res.redirect("/");
+//     } catch (err) {
+//     res.redirect("/");
+//     }
+//     });
+
+
+//receive messages at 127.0.0.1:3000/messages
+app.post("/items", function(request,response){
+    let item = new Item(request.body); 
+    item.save(function(error, item){
+        if(error){ 
+            response.sendStatus(500); 
+            return console.error(error); 
+        }; 
+        //io.emit('message', request.body); 
+        response.sendStatus(200);
+    })
+}); 
+
+
+//UPDATE 
+app
+.route("/edit/:id")
+.get((req, res) => {
+const id = req.params.id;
+Item.find({}, (err, items) => {
+res.render("todoEdit.ejs", { itemName: item, idTask: id });
+});
+})
+.post((req, res) => {
+const id = req.params.id;
+Item.findByIdAndUpdate(id, { content: req.body.content }, err => {
+if (err) return res.send(500, err);
+res.redirect("/");
+});
+});
 
 
 //HOMEWORK!! figure out how to retrieve a specific item from the list 
