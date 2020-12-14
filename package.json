@@ -7,7 +7,6 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
-
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Crystal-McCorkle-SKC/todolist.git"
@@ -17,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/Crystal-McCorkle-SKC/todolist/issues"
   },
-  "homepage": "https://github.com/Crystal-McCorkle-SKC/todolist#readme"
+  "homepage": "https://github.com/Crystal-McCorkle-SKC/todolist#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
