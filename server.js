@@ -9,9 +9,13 @@ mongoose.set("useFindAndModify", false);
 //this is setting vars for Item and List --pulls in the files from my other .js files 
 const List = require("./models/ToDo.js");
 const Item = require("./models/ToDoItem.js");
+//body parser
+const bodyParser = require("body-parser");
 
 //this loads in the express module 
 const express = require("express");
+//this lets us register the routes and use it in the application 
+//const router = express.Router(); 
 //this loads in the path module (works w/ file/directory methods/paths to make things easier)
 const path = require("path");
 
@@ -45,6 +49,8 @@ db.on("error", console.error.bind(console, "MongoDB connection error:"));
 //static defaults to delivering index.html as the default root 
 //path.join: takes care of relative paths 
 app.use(express.static(path.join(__dirname, "public")));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
 
 
 //Add a app.post to send some data and save it 
@@ -55,33 +61,56 @@ app.use(express.static(path.join(__dirname, "public")));
 
 
 
-//urlencoded extracts the data from the form and adds to body 
-app.use(express.urlencoded({ extended: true }));
-
 //opening up our server to listen on a specific ip address and port
 //ip addresses are also known as hostnames 
 app.listen(port, function(){
     console.log("The server IS running AT port " + port);
 });
 
-// //gets full list  
-//  app.get("/items", function(request, response){
-// //     //response.send("Hello World!!!!!");
-//     //get data
-//      Item.find(function (err, items) {
-//         if (err) return console.error(err);
-//        //this send the items back to the client 
-//         response.send(items);
-//      });
+//gets full list  
+ app.get("/items", function(request, response){
+//     //response.send("Hello World!!!!!");
+    //get data
+     Item.find(function (err, items) {
+        if (err) {
+            return console.error(err);
+        }
+       //this send the items back to the client 
+        response.send(items);
+     });
+    });
+
+
+// app
+//     //.route("/edit/:id")
+//     .get("/items",function(req, res) {
+//     const id = req.params.id;
+//     Item.find({}, (err, tasks) => {
+//     res.render("edit.html", { itemName: name });
 //     });
+//     })
+//     .post((req, res) => {
+//     const id = req.params.id;
+//     Item.findByIdAndUpdate(id, { content: req.body.content }, err => {
+//     if (err) return res.send(500, err);
+//     res.redirect("/");
+//     });
+// });
+
+
+
+
+
+
+
 
 
 // GET METHOD-gets items 
-app.get("/items", (req, res) => {
-    Item.find({}, (err, tasks) => {
-    res.render("index.html", { itemName: item });
-    });
-});
+// app.get("/items", (req, res) => {
+//     Item.find({}, (err, tasks) => {
+//     res.render("index.html", { itemName: item });
+//     });
+// });
 
 
 
@@ -99,36 +128,79 @@ app.get("/items", (req, res) => {
 //     });
 
 
-//receive messages at 127.0.0.1:3000/messages
+//receive messages at 127.0.0.1:3000/items   post=creates data 
 app.post("/items", function(request,response){
-    let item = new Item(request.body); 
+    let item = new Item(request.body.content); 
     item.save(function(error, item){
         if(error){ 
             response.sendStatus(500); 
             return console.error(error); 
-        }; 
-        //io.emit('message', request.body); 
+        };  
+        //response.sendStatus(200).send(item);
         response.sendStatus(200);
     })
 }); 
 
 
-//UPDATE 
-app
-.route("/edit/:id")
-.get((req, res) => {
-const id = req.params.id;
-Item.find({}, (err, items) => {
-res.render("todoEdit.ejs", { itemName: item, idTask: id });
-});
+//PUT--update data 
+app.put("/items", function(request,response){
+    let item = new Item(request.body.content); 
+    item.save(function(error, item){
+        if(error){ 
+            response.sendStatus(500); 
+            return console.error(error); 
+        };  
+        //response.sendStatus(200).send(item);
+        response.sendStatus(200);
+    })
+}); 
+
+
+//trying
+app.route("/edit/:id")
+    .get((req, res) => {
+    const id = req.params.id;
+    Item.find({}, (err, tasks) => {
+    res.render("edit.html", { itemName: name });
+    });
 })
-.post((req, res) => {
-const id = req.params.id;
-Item.findByIdAndUpdate(id, { content: req.body.content }, err => {
-if (err) return res.send(500, err);
-res.redirect("/");
+    .post((req, res) => {
+    const id = req.params.id;
+    Item.findByIdAndUpdate(id, { content: req.body.content }, err => {
+    if (err) return res.send(500, err);
+    res.redirect("/");
+    });
 });
-});
+
+//create item--do i even need this??? it's the same as above! 
+// app.post("/items", function (request, response){
+//     let item = new Item(request.body.content);
+//     item.save(function(error, item) {
+//         if (error){
+//             response.sendStatus(500);
+//             return console.error(err);
+//         };
+//         response.sendStatus(200);
+//     })
+// });
+
+
+//UPDATE 
+// app
+// .route("/edit/:id")
+// .get((req, res) => {
+// const id = req.params.id;
+// Item.find({}, (err, items) => {
+// res.render("todoEdit.ejs", { itemName: item });
+// });
+// })
+// .post((req, res) => {
+// const id = req.params.id;
+// Item.findByIdAndUpdate(id, { content: req.body.content }, err => {
+// if (err) return res.send(500, err);
+// res.redirect("/");
+// });
+// });
 
 
 //HOMEWORK!! figure out how to retrieve a specific item from the list 

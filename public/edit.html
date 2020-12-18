@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>To Do List</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="style.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    </head>
+    <body>
+        <!-- <div class="todo-container"> -->
+            <!-- <h1>To Do List</h1> -->
+                <!-- <div class="todo"> -->
+                <!--<form action="/" method="POST" class="todo-header"> -->
+                <!-- <form action="/" method="POST" class="todo-header">
+                    <input type="text" name="content">
+                    <input id ="itemName" class = "form-control" placeholder="Item Name">
+                    <input id ="itemName" class = "form-control" placeholder="Item Name">
+                    <button type="submit"><span class="fas fa-plus" onclick="clickButton()"></span></button>
+                </form> -->
+
+
+
+<!--THINGS I NEED TO DO for this app:
+-get post to work--YES!
+-get create to work 
+-get edit to work
+-get delete to work
+-make sure all html is lined up
+-stylize everything (use bootstrap to make sure mobile responsive)
+-host on heroku if time! 
+-->
+<section>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8 mx-auto text-center">
+				<div class="align-items-center">
+					<h1 class="toDoList">To Do List</h1>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+
+
+<section class="form">
+    <form>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="inputTask">Task</label>
+            <input type="text" class="form-control" id="inputTask" name="inputTask" placeholder="Task Name">
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+            <label for="priorityStat">Priority Status:</label>
+            <select name="priorityStatus" >
+              <option label="Select One"></option>
+                <option id="priorityStatus" value="low">Low</option> 
+                <option id="priorityStatus" value="medium">Medium</option>
+                <option id="priorityStatus" value="high">High</option>
+            </select>
+            </div>
+            </div>
+          <div class="form-group col-md-6">
+            <label for="inputAssignee">Assignee</label>
+            <input type="text" class="form-control" id="inputAssignee" name="inputAssignee" placeholder="Assignee">
+          </div>
+        </div>
+        <div class="form-group row">
+            <!--NEED TO MAKE SURE YOU CAN ONLY SELECT ONE, right now can select both!-->
+            <div class="col-sm-2" id="completed">Completed?</div>
+            <div class="col-sm-10">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="completedYes" name="completedYes">
+                <label class="form-check-label" for="completedYes">
+                  Yes
+                </label>
+                <input class="form-check-input" type="checkbox" id="completedNo" name="completedNo">
+                <label class="form-check-label" for="completedNo">
+                  No
+                </label>
+              </div>
+            </div>
+          </div>
+    </form>
+</section>
+    
+         
+
+<section>
+    <div class="container">
+    <div class="row">
+        <div class="col-md-8 mx-auto text-center">
+            <div class="align-items-center">
+                <ul class="todo-list">
+                    <li class="todo-list-item">
+                        <div id="todo-list-item-name"></div>
+                                    <a href="" id="edit">
+                                        <span class="fas fa-edit"></span>
+                                    </a>
+                                    <a href="" id="remove">
+                                        <span class="fas fa-times"></span>
+                                    </a>
+                    </li>
+                </ul>
+                <!--remove below??--> 
+        <button onclick="clickButton()">Click me</button> 
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+
+<section>
+    <div id="newItems"></div>
+</section>
+                
+        
+
+       
+        
+        <script src="todo.js"></script>
+ 
+        <script>
+
+             //function to update item on the client side, get id
+            //to get id 
+            const url = window.location.href; //gets the url from the window 
+            //console.log(url);
+            const myUrl = new URL (url); //creates a url instance w/ our url 
+            let id = myUrl.searchParams.get("id"); //look for the id of the url
+            console.log(id);
+            //then call the updateAPI(id);
+
+
+           
+
+
+            document.getElementById("edit").addEventListener("click", function(event){
+                event.preventDefault();
+                //alert("HELLO!"); worked
+            
+        
+            async function editItem(){
+                Item.create({ itemName : String,
+                                    itemPriority : {type: String, enum: ["High", "Medium", "Low"]},
+                                    assignee : String,
+                                    completed : Boolean,
+                                });
+                const filter = {
+                    itemName : document.getElementById("inputTask").value,
+                    itemPriority : document.getElementById("priorityStatus").value,
+                    assignee : document.getElementById("inputAssignee").value,
+                    completed : document.getElementById("completed").value, 
+                }
+
+                const update = { 
+                    itemName : document.getElementById("inputTask").value,
+                    itemPriority : document.getElementById("priorityStatus").value,
+                    assignee : document.getElementById("inputAssignee").value,
+                    completed : document.getElementById("completed").value, 
+                }
+
+                let doc = await Item.findOneAndUpdate(filter, update);
+                doc.itemName; //does this return anything? 
+                doc.itemPriority;
+
+                doc = await Item.findOne(filter);
+                doc.itemName;
+
+                let requestOptions = {
+                    method: "GET",
+                    headers: {"Content-Type": "application/json"}
+                }
+                const response = await fetch("/items" + id, requestOptions);
+                const body = await response.json();
+                if (response.status != 200) {
+                    throw Error(body.message);  
+                } return body;
+            };
+        })
+
+
+    //         async function postItem() {
+    // let item = {
+    //     itemName : document.getElementById("inputTask").value,
+    //     itemPriority : document.getElementById("priorityStatus").value,
+    //     assignee : document.getElementById("inputAssignee").value,
+    //     completed : document.getElementById("completed").value,
+    // }
+
+    // let requestOptions = {
+    //     method: "POST",
+    //     body: JSON.stringify(item),
+    //     headers: {"Content-Type": "application/json"}
+    // }
+
+    //fetch calls the api 
+    
+    // const response = await fetch("/items", requestOptions);
+    //const body = await response.JSON();
+  
+    //json traverses the response object and returns the body 
+    // const body = await response.json();
+    //if the http status is good, return the body (the api)
+    // if (response.status != 200) {
+    //    //throw Error(body.item);
+    //    throw Error("Error!");
+    // }
+    //    return true;
+    // }
+        
+// } 
+
+
+
+
+
+
+
+            //const app = express();
+
+            // app
+            //     .route("/edit/:id")
+            //     .get("/items",function(req, res) {
+            //     const id = req.params.id;
+            //     Item.find({}, (err, tasks) => {
+            //     res.render("edit.html", { itemName: name });
+            //     });
+            //     })
+            //     .post((req, res) => {
+            //     const id = req.params.id;
+            //     Item.findByIdAndUpdate(id, { content: req.body.content }, err => {
+            //     if (err) return res.send(500, err);
+            //     res.redirect("/");
+            //     });
+            // });
+
+
+
+
+            //search query
+            // {itemName: "Do Dishes"
+            // }
+            // //this is the field (name) and the value to update to: Scrub-a-dub those dishes!! 
+            // {itemName: "Scrub-a-dub those dishes!!"
+            // }
+            // //returns updated doc
+            // { new : true,
+            //     //validates before update
+            //   runValidators: true
+            // });
+            // //updates the record and prints 
+            // .then(doc => {
+            //     console.log(doc)
+            // })
+            // //if there is an error, returns this 
+            // .catch(err => {
+            //     console.error(err)
+            // });
+        </script>
+    </body>
+</html>
+
+
+
+
+
+
+
+
+
+
+  
