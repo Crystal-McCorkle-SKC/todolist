@@ -49,36 +49,83 @@ db.on("error", console.error.bind(console, "MongoDB connection error:"));
 //static defaults to delivering index.html as the default root 
 //path.join: takes care of relative paths 
 app.use(express.static(path.join(__dirname, "public")));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
 
-
-//Add a app.post to send some data and save it 
-//Add a app.put call to update some data
-//Add a app.delete call to delete some data 
-//(We've already written mongoose code to do this, so you're plugging in the rest using our GET code as an example). 
- 
-
-
+//more middleware to handle the request processing
+app.use(express.json());
+app.use(express.urlencoded({extended: false}));
 
 //opening up our server to listen on a specific ip address and port
 //ip addresses are also known as hostnames 
 app.listen(port, function(){
-    console.log("The server IS running AT port " + port);
+    console.log("The server is running at port " + port);
 });
 
+
+
+//API LIVES HERE!! AKA REST API! YAYYYYYY!
 //gets full list  
- app.get("/items", function(request, response){
-//     //response.send("Hello World!!!!!");
-    //get data
-     Item.find(function (err, items) {
-        if (err) {
-            return console.error(err);
+app.get("/items", function(request, response){
+    /*get data*/ 
+    Item.find(function(err, items){
+            if (err) return console.error(err);
+            response.send(items); 
+    });    
+}); 
+
+
+
+//POST--creates data 
+app.post("/items", function(request, response){
+    let newData = new Item(request.body); 
+    newData.save(function(error,item){
+        if(error) { console.log(error); 
+            response.sendStatus(500);     
         }
-       //this send the items back to the client 
-        response.send(items);
-     });
-    });
+        console.log("Success, item added!"); 
+        response.sendStatus(200); 
+    }); 
+
+});
+
+//DELETE --deletes data 
+app.delete("/items", function(request, response){
+    /*delete data*/ 
+    Item.deleteOne(request.body, function(err){
+            if (err) {console.log(err); return; }
+            response.sendStatus(204); 
+    });    
+}); 
+
+
+//EDIT items
+app.put("/items", function(request, response){
+    /*update data*/ 
+    Item.findOneAndUpdate(request.body, function(err){
+            if (err) {console.log(err); return; }
+            response.sendStatus(200); 
+    });    
+}); 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // app
@@ -129,48 +176,48 @@ app.listen(port, function(){
 
 
 //receive messages at 127.0.0.1:3000/items   post=creates data 
-app.post("/items", function(request,response){
-    let item = new Item(request.body.content); 
-    item.save(function(error, item){
-        if(error){ 
-            response.sendStatus(500); 
-            return console.error(error); 
-        };  
-        //response.sendStatus(200).send(item);
-        response.sendStatus(200);
-    })
-}); 
+// app.post("/items", function(request,response){
+//     let item = new Item(request.body.content); 
+//     item.save(function(error, item){
+//         if(error){ 
+//             response.sendStatus(500); 
+//             return console.error(error); 
+//         };  
+//         //response.sendStatus(200).send(item);
+//         response.sendStatus(200);
+//     })
+// }); 
 
 
 //PUT--update data 
-app.put("/items", function(request,response){
-    let item = new Item(request.body.content); 
-    item.save(function(error, item){
-        if(error){ 
-            response.sendStatus(500); 
-            return console.error(error); 
-        };  
-        //response.sendStatus(200).send(item);
-        response.sendStatus(200);
-    })
-}); 
+// app.put("/items", function(request,response){
+//     let item = new Item(request.body.content); 
+//     item.save(function(error, item){
+//         if(error){ 
+//             response.sendStatus(500); 
+//             return console.error(error); 
+//         };  
+//         //response.sendStatus(200).send(item);
+//         response.sendStatus(200);
+//     })
+// }); 
 
 
 //trying
-app.route("/edit/:id")
-    .get((req, res) => {
-    const id = req.params.id;
-    Item.find({}, (err, tasks) => {
-    res.render("edit.html", { itemName: name });
-    });
-})
-    .post((req, res) => {
-    const id = req.params.id;
-    Item.findByIdAndUpdate(id, { content: req.body.content }, err => {
-    if (err) return res.send(500, err);
-    res.redirect("/");
-    });
-});
+// app.route("/edit/:id")
+//     .get((req, res) => {
+//     const id = req.params.id;
+//     Item.find({}, (err, tasks) => {
+//     res.render("edit.html", { itemName: name });
+//     });
+// })
+//     .post((req, res) => {
+//     const id = req.params.id;
+//     Item.findByIdAndUpdate(id, { content: req.body.content }, err => {
+//     if (err) return res.send(500, err);
+//     res.redirect("/");
+//     });
+// });
 
 //create item--do i even need this??? it's the same as above! 
 // app.post("/items", function (request, response){

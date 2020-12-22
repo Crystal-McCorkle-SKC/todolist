@@ -11,114 +11,33 @@
 integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
     </head>
     <body>
-        <!-- <div class="todo-container"> -->
-            <!-- <h1>To Do List</h1> -->
-                <!-- <div class="todo"> -->
-                <!--<form action="/" method="POST" class="todo-header"> -->
-                <!-- <form action="/" method="POST" class="todo-header">
-                    <input type="text" name="content">
-                    <input id ="itemName" class = "form-control" placeholder="Item Name">
-                    <input id ="itemName" class = "form-control" placeholder="Item Name">
-                    <button type="submit"><span class="fas fa-plus" onclick="clickButton()"></span></button>
-                </form> -->
-
-
-
-<!--THINGS I NEED TO DO for this app:
--get post to work--YES!
--get create to work 
--get edit to work
--get delete to work
--make sure all html is lined up
--stylize everything (use bootstrap to make sure mobile responsive)
--host on heroku if time! 
--->
-<section>
-	<div class="container">
-		<div class="row">
-			<div class="col-md-8 mx-auto text-center">
-				<div class="align-items-center">
-					<h1 class="toDoList">To Do List</h1>
-				</div>
-			</div>
-		</div>
-	</div>
-</section>
-
-
-
-<section class="form">
-    <form>
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <label for="inputTask">Task</label>
-            <input type="text" class="form-control" id="inputTask" name="inputTask" placeholder="Task Name">
-          </div>
-          <div class="form-row">
-            <div class="form-group col-md-6">
-            <label for="priorityStat">Priority Status:</label>
-            <select name="priorityStatus" >
-              <option label="Select One"></option>
-                <option id="priorityStatus" value="low">Low</option> 
-                <option id="priorityStatus" value="medium">Medium</option>
-                <option id="priorityStatus" value="high">High</option>
-            </select>
+        <section>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-8 mx-auto text-center">
+                        <div class="align-items-center">
+                  <h1 class="toDoList">To Do List</h1>
+                    <button class="button">Click me for items</button>
+                    <div id="list"></div>
+                      <div>
+                        <input type = "text" placeholder = "Item Name" id="itemName"></input>
+                        <select name="priorities" id="itemPriority">
+                          <option label="Select Urgency Status"></option>
+                          <option value="Low">Low</option> 
+                          <option value="Medium">Medium</option>
+                          <option value="High">High</option>
+                        </select>
+                        <input type = "text" placeholder = "Assignee" id="assignee"></input>
+                          <button  class="button" onclick="editItem()">Edit Item</button>
+                          <!-- <button id="editButton">Edit</button> -->
+                      </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            </div>
-          <div class="form-group col-md-6">
-            <label for="inputAssignee">Assignee</label>
-            <input type="text" class="form-control" id="inputAssignee" name="inputAssignee" placeholder="Assignee">
-          </div>
-        </div>
-        <div class="form-group row">
-            <!--NEED TO MAKE SURE YOU CAN ONLY SELECT ONE, right now can select both!-->
-            <div class="col-sm-2" id="completed">Completed?</div>
-            <div class="col-sm-10">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="completedYes" name="completedYes">
-                <label class="form-check-label" for="completedYes">
-                  Yes
-                </label>
-                <input class="form-check-input" type="checkbox" id="completedNo" name="completedNo">
-                <label class="form-check-label" for="completedNo">
-                  No
-                </label>
-              </div>
-            </div>
-          </div>
-    </form>
-</section>
+        </section>  
     
-         
 
-<section>
-    <div class="container">
-    <div class="row">
-        <div class="col-md-8 mx-auto text-center">
-            <div class="align-items-center">
-                <ul class="todo-list">
-                    <li class="todo-list-item">
-                        <div id="todo-list-item-name"></div>
-                                    <a href="" id="edit">
-                                        <span class="fas fa-edit"></span>
-                                    </a>
-                                    <a href="" id="remove">
-                                        <span class="fas fa-times"></span>
-                                    </a>
-                    </li>
-                </ul>
-                <!--remove below??--> 
-        <button onclick="clickButton()">Click me</button> 
-            </div>
-        </div>
-    </div>
-</div>
-</section>
-
-<section>
-    <div id="newItems"></div>
-</section>
-                
         
 
        
@@ -127,94 +46,195 @@ integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7
  
         <script>
 
-             //function to update item on the client side, get id
+
+
+    
+
+//function to update item on the client side, get id
             //to get id 
             const url = window.location.href; //gets the url from the window 
             //console.log(url);
             const myUrl = new URL (url); //creates a url instance w/ our url 
-            let id = myUrl.searchParams.get("id"); //look for the id of the url
-            console.log(id);
+            let myId = myUrl.searchParams.get("_id"); //look for the id of the url
+            //(${body[i]._id})
+            // console.log(myId); //prints the id to the console 
             //then call the updateAPI(id);
+
+
+function editItem(){
+    getToDoList().then(function(body) {
+        let list = document.getElementById("list");
+        let myHtml = "<ul>";
+        for (let i = 0; i < body.length; i++) {
+            //above loops over items, and then can do stuff to items here
+            //PUT CARDS OR SOME KIND OF TABLE HERE TO FORMAT EVERYTHING SO IT LOOKS PRETTY! <p> tags/h1 tags, etc 
+            //can also add class on all of them and then put that in css file to stylize this text!
+            //probably could add in my font awesome icons here too!  
+            //try this instead of button w/ a class name instead of id <a id=""><i>fontaesomestuffhere</i></a>
+            myHtml += `
+                    <li class="listItems"> ${body[i].itemName}    ${body[i].assignee}    ${body[i].itemPriority}    ${body[i].completed} </li>
+                    <a href="edit.html?${body[i]._id}"><button id="edit">Edit</button></a>
+                    
+                    
+            `;
+        }
+        myHtml += "</ul>";
+        list.innerHTML = myHtml;
+
+        //get all elements and then loop over them all to add event listener
+        // let deleteButtons = document.getElementsByClassName("delete");
+        // for (let i = 0; i < deleteButtons.length; i++){
+        //     deleteButtons[i].addEventListener("click", function(event){
+        //     deleteItem(event.target.dataset.id);
+        //     });
+        // }
+
+        //edit--just trying 
+        // let editButton = document.getElementsById("edit");
+        // for (let i = 0; i < editButton.length; i++){
+        //     editButton[i].addEventListener("click", function(event){
+        //     editItem(event.target.dataset.id);
+        //     });
+        // }
+        
+    }).catch(function(err) {
+        console.log(err);
+    });
+}
+    
+
+    async function editItemRequest(id) {
+    
+    let dropdown = document.getElementById("itemPriority");
+    let selection = dropdown.options[dropdown.selectedIndex].value;
+
+
+    let data = {
+        _id: id,
+        itemName : document.getElementById("itemName").value,
+        itemPriority : selection,
+        assignee : document.getElementById("assignee").value,
+        completed : false,
+
+    }
+
+
+    let requestOptions = {
+        method: "PUT",
+        //this body is the body of the request, has to take an object/data
+        body: JSON.stringify(data),
+        headers: {"Content-Type": "application/json"}
+    }
+
+    //fetch calls the api 
+    const response = await fetch("/items", requestOptions);
+
+    return false;
+}
+
+
+
+
+
+
+
+    function editItem(id){
+        editItemRequest(id).then(function(success){
+        alert("EDITED!");
+        }).catch(function(error){
+            console.log(error);
+        });
+    }
+
+
+    
+
+
+
+
+
+
+
+
 
 
            
 
 
-            document.getElementById("edit").addEventListener("click", function(event){
-                event.preventDefault();
-                //alert("HELLO!"); worked
+//             document.getElementById("edit").addEventListener("click", function(event){
+//                 event.preventDefault();
+//                 alert("HELLO!"); worked
             
         
-            async function editItem(){
-                Item.create({ itemName : String,
-                                    itemPriority : {type: String, enum: ["High", "Medium", "Low"]},
-                                    assignee : String,
-                                    completed : Boolean,
-                                });
-                const filter = {
-                    itemName : document.getElementById("inputTask").value,
-                    itemPriority : document.getElementById("priorityStatus").value,
-                    assignee : document.getElementById("inputAssignee").value,
-                    completed : document.getElementById("completed").value, 
-                }
+//             async function editItem(){
+//                 Item.create({ itemName : String,
+//                                     itemPriority : {type: String, enum: ["High", "Medium", "Low"]},
+//                                     assignee : String,
+//                                     completed : Boolean,
+//                                 });
+//                 const filter = {
+//                     itemName : document.getElementById("inputTask").value,
+//                     itemPriority : document.getElementById("priorityStatus").value,
+//                     assignee : document.getElementById("inputAssignee").value,
+//                     completed : document.getElementById("completed").value, 
+//                 }
 
-                const update = { 
-                    itemName : document.getElementById("inputTask").value,
-                    itemPriority : document.getElementById("priorityStatus").value,
-                    assignee : document.getElementById("inputAssignee").value,
-                    completed : document.getElementById("completed").value, 
-                }
+//                 const update = { 
+//                     itemName : document.getElementById("inputTask").value,
+//                     itemPriority : document.getElementById("priorityStatus").value,
+//                     assignee : document.getElementById("inputAssignee").value,
+//                     completed : document.getElementById("completed").value, 
+//                 }
 
-                let doc = await Item.findOneAndUpdate(filter, update);
-                doc.itemName; //does this return anything? 
-                doc.itemPriority;
+//                 let doc = await Item.findOneAndUpdate(filter, update);
+//                 doc.itemName; //does this return anything? 
+//                 doc.itemPriority;
 
-                doc = await Item.findOne(filter);
-                doc.itemName;
+//                 doc = await Item.findOne(filter);
+//                 doc.itemName;
 
-                let requestOptions = {
-                    method: "GET",
-                    headers: {"Content-Type": "application/json"}
-                }
-                const response = await fetch("/items" + id, requestOptions);
-                const body = await response.json();
-                if (response.status != 200) {
-                    throw Error(body.message);  
-                } return body;
-            };
-        })
+//                 let requestOptions = {
+//                     method: "PUT",
+//                     headers: {"Content-Type": "application/json"}
+//                 }
+//                 const response = await fetch("/items" + id, requestOptions);
+//                 const body = await response.json();
+//                 if (response.status != 200) {
+//                     throw Error(body.message);  
+//                 } return body;
+//             };
+//         })
 
 
-    //         async function postItem() {
-    // let item = {
-    //     itemName : document.getElementById("inputTask").value,
-    //     itemPriority : document.getElementById("priorityStatus").value,
-    //     assignee : document.getElementById("inputAssignee").value,
-    //     completed : document.getElementById("completed").value,
-    // }
+//             async function postItem() {
+//     let item = {
+//         itemName : document.getElementById("inputTask").value,
+//         itemPriority : document.getElementById("priorityStatus").value,
+//         assignee : document.getElementById("inputAssignee").value,
+//         completed : document.getElementById("completed").value,
+//     }
 
-    // let requestOptions = {
-    //     method: "POST",
-    //     body: JSON.stringify(item),
-    //     headers: {"Content-Type": "application/json"}
-    // }
+//     let requestOptions = {
+//         method: "POST",
+//         body: JSON.stringify(item),
+//         headers: {"Content-Type": "application/json"}
+//     }
 
-    //fetch calls the api 
+//    // fetch calls the api 
     
-    // const response = await fetch("/items", requestOptions);
-    //const body = await response.JSON();
+//     const response = await fetch("/items", requestOptions);
+   
   
-    //json traverses the response object and returns the body 
-    // const body = await response.json();
-    //if the http status is good, return the body (the api)
-    // if (response.status != 200) {
-    //    //throw Error(body.item);
-    //    throw Error("Error!");
-    // }
-    //    return true;
-    // }
+//     //json traverses the response object and returns the body 
+//     const body = await response.json();
+//     //if the http status is good, return the body (the api)
+//     if (response.status != 200) {
+//        //throw Error(body.item);
+//        throw Error("Error!");
+//     }
+//        return true;
+//     }
         
-// } 
 
 
 
@@ -222,46 +242,11 @@ integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7
 
 
 
-            //const app = express();
-
-            // app
-            //     .route("/edit/:id")
-            //     .get("/items",function(req, res) {
-            //     const id = req.params.id;
-            //     Item.find({}, (err, tasks) => {
-            //     res.render("edit.html", { itemName: name });
-            //     });
-            //     })
-            //     .post((req, res) => {
-            //     const id = req.params.id;
-            //     Item.findByIdAndUpdate(id, { content: req.body.content }, err => {
-            //     if (err) return res.send(500, err);
-            //     res.redirect("/");
-            //     });
-            // });
 
 
 
 
-            //search query
-            // {itemName: "Do Dishes"
-            // }
-            // //this is the field (name) and the value to update to: Scrub-a-dub those dishes!! 
-            // {itemName: "Scrub-a-dub those dishes!!"
-            // }
-            // //returns updated doc
-            // { new : true,
-            //     //validates before update
-            //   runValidators: true
-            // });
-            // //updates the record and prints 
-            // .then(doc => {
-            //     console.log(doc)
-            // })
-            // //if there is an error, returns this 
-            // .catch(err => {
-            //     console.error(err)
-            // });
+            
         </script>
     </body>
 </html>
